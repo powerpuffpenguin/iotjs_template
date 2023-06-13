@@ -1,0 +1,19 @@
+{
+    "C_Cpp.default.includePath": [
+        "${workspaceRoot}/../iotjs/dst/linux_amd64/include",
+        "${workspaceRoot}/../iotjs/dst/linux_amd64/iotjs/include",
+        "${workspaceRoot}/src"
+    ],
+    "files.associations": {
+        "*.json": "jsonc",
+        "vm.h": "c",
+        "bitset": "c",
+        "chrono": "c",
+        "algorithm": "c",
+        "__bit_reference": "c",
+        "map": "c",
+        "set": "c",
+        "unordered_map": "c",
+        "unordered_set": "c"
+    }
+}
