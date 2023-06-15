@@ -24,6 +24,6 @@ module.exports = {
             'node_modules/'
         ],
         descriptionFiles: ['package.json'],
-        extensions: ['.ts'],
+        extensions: ['.ts', '.js'],
     },
 }

@@ -23,6 +23,8 @@ define_command(){
         -v cmake -s c
     command_flags -t bool -d 'Execute make' \
         -v make -s m
+    command_flags -t bool -d 'Embedding bundle.js' \
+        -v bundle -s b
     command_flags -t string -d 'set CMAKE_BUILD_TYPE' \
         -v build_type -l build-type \
         -V None -V Debug -V Release -V RelWithDebInfo -V MinSizeRel \
@@ -55,15 +57,57 @@ c_iotjs(){
         make
     fi
 }
+c_find(){
+    local ifs=$IFS
+    IFS=$'\n'
+    files=(`find "$1" -name "$2"`)
+    IFS=$ifs
+}
+c_bundle(){
+    c_find "bin/src" "*.ts"
+    local sum0="bin/bundle.0.sum"
+    local sum="bin/bundle.sum"
+    echo > "$sum0"
+    for file in "${files[@]}";do
+        md5sum "$file" >> "$sum0"
+    done
+    if [[ -f "$sum" ]];then
+        local v0=(`md5sum "$sum0"`)
+        local v1=(`md5sum "$sum"`)
+        if [[ "$v0" == "$v1" ]];then
+            return
+        fi
+    fi
+    webpack
+    cp "$sum0" "$sum"
+}
 c_execute(){
     core_call_assert time_unix
     local start=$result
+    if [[ $bundle == true ]];then
+        log_info "webpack"
+        time_unix
+        used=$result
+        c_bundle
+        time_since $used
+        log_info "webpack, used ${result}s"
+
+        echo "#ifndef MY_IOTJS_BIN_BUNDLE_XXD_H" > "src/bundle.h"
+        echo "#define MY_IOTJS_BIN_BUNDLE_XXD_H" >> "src/bundle.h"
+        xxd -i "bin/bundle.js" >> "src/bundle.h"
+        echo "#endif // MY_IOTJS_BIN_BUNDLE_XXD_H" >> "src/bundle.h"
+    fi
 
     local target="${os}_$arch"
     local iotjs_arch=$arch
     local cmake_args=(
         -DCMAKE_SYSTEM_NAME=Linux
     )
+    if [[ $bundle == true ]];then
+        cmake_args=(
+            -DIOTJS_BUNDLE=ON
+        )
+    fi
     local wolfssl_host
     case "$target" in
         linux_csky)

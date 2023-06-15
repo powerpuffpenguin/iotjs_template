@@ -167,3 +167,5 @@ dkms.conf
 /bin/dst/
 /bin/bundle.js
 /src/js/
+/src/bundle.h
+*.sum

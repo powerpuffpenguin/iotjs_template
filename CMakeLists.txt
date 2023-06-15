@@ -10,7 +10,11 @@ list(APPEND target_definitions
     "-DVM_IOTJS_OS=\"${VM_IOTJS_OS}\""
     "-DVM_IOTJS_ARCH=\"${VM_IOTJS_ARCH}\""
 )
-
+if(IOTJS_BUNDLE)
+    list(APPEND target_definitions
+        "-DVM_IOTJS_BUNDLE"
+    )
+endif()
 
 if(LINK_STATIC_GLIC)
     set(CMAKE_EXE_LINKER_FLAGS "-static")
